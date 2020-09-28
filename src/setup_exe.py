@@ -2,4 +2,4 @@ from distutils.core import setup
 
 import py2exe
 
-setup(console=["word_replace.py"])
+setup(console=["gui.py"])

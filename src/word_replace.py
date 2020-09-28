@@ -27,10 +27,13 @@ class TemplateReplace(object):
 
 class ParesSettings(object):
 
-    def __init__(self, template=None):
+    def __init__(self, settings=None, sub_dir=None, temp_dir=None, output_dir=None):
         """"""
-        self.tempate = template
-        self.template_list = []
+        self.settings = settings
+        self.settings_list = []
+        self.sub_dir = os.path.abspath(sub_dir or os.sep.join(['.', 'sub_doc']))
+        self.temp_dir = os.path.abspath(temp_dir or os.sep.join(['.', 'template']))
+        self.output_dir = os.path.abspath(output_dir or os.sep.join(['.', 'output']))
 
     def load_settings(self, f_name):
         """"""
@@ -46,26 +49,26 @@ class ParesSettings(object):
                     if not dt['key']:
                         continue
                     if dt.get('value_type') == 'sub_doc':
-                        value = os.sep.join(['.', 'sub_doc', dt.get('value', '')])
+                        value = os.sep.join([self.sub_dir, dt.get('value', '')])
                     else:
                         value = dt.get('value', '')
                     st[dt['key']] = {'value_type': dt.get('value_type'), 'value': value}
-                generate_name = os.sep.join(['.', 'output', out_name])
+                generate_name = os.sep.join([self.output_dir, out_name])
 
                 single_temp_st[generate_name] = st
 
-            template_name = os.sep.join(['.', 'template', template_name])
+            template_name = os.sep.join([self.temp_dir, template_name])
 
             res.append([template_name, single_temp_st])
         return res
 
     def load(self):
-        if self.tempate:
-            return self.load_settings(self.tempate)
+        if self.settings:
+            return self.load_settings(self.settings)
         else:
             res = []
-            self.template_list = os.listdir('./settings')
-            for f in self.template_list:
+            self.settings_list = os.listdir('./settings')
+            for f in self.settings_list:
                 if f.startswith('~'):
                     continue
                 f_name = os.sep.join(['.', 'settings', f])
@@ -73,9 +76,9 @@ class ParesSettings(object):
             return res
 
 
-def pares():
+def pares(settings=None, sub_dir=None, temp_dir=None, output_dir=None):
     """"""
-    settings_list = ParesSettings().load()
+    settings_list = ParesSettings(settings, sub_dir, temp_dir, output_dir).load()
     for template_name, st in settings_list:
         # template_name = os.sep.join(['.', 'template', template_name])
         TemplateReplace(template_name, st).render()
